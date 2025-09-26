@@ -1,6 +1,7 @@
 import path from 'path';
 
 import js from '@eslint/js';
+import cssModulesPlugin from 'eslint-plugin-css-modules';
 import importPlugin from 'eslint-plugin-import';
 import perfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
@@ -48,6 +49,7 @@ export default tseslint.config([
       sourceType: 'module',
     },
     plugins: {
+      'css-modules': cssModulesPlugin,
       perfectionist,
       react,
       'react-refresh': reactRefresh,
@@ -55,6 +57,8 @@ export default tseslint.config([
     },
     rules: {
       'import/order': 'off',
+      'css-modules/no-undef-class': 'error',
+      'css-modules/no-unused-class': 'warn',
       'perfectionist/sort-imports': [
         'error',
         {
@@ -95,6 +99,13 @@ export default tseslint.config([
       'react-hooks/exhaustive-deps': 'off',
     },
     settings: {
+      'css-modules': {
+        camelCase: 'true',
+        filetypes: {
+          '.css': 'postcss',
+          '.module.css': 'postcss',
+        },
+      },
       react: {
         version: 'detect',
       },

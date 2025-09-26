@@ -35,7 +35,6 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "plugins": [{ "name": "typescript-plugin-css-modules" }],
   "include": ["src"],
   "exclude": ["cypress"],
   "references": [{ "path": "./tsconfig.node.json" }],
