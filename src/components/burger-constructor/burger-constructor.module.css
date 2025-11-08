@@ -1,7 +1,55 @@
 .burger_constructor {
   display: flex;
   flex-direction: column;
+  gap: 16px;
   width: 600px;
-  padding-bottom: 20px;
+  margin-right: -12px;
+  padding-right: 12px;
   color: var(--text-primary-color);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 80px;
+}
+
+.handlePlaceholder {
+  width: 24px;
+  height: 24px;
+  visibility: hidden;
+}
+
+.scrollArea {
+  max-height: 464px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.totalBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 40px;
+  padding-right: 16px;
+}
+
+.priceGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+  text-align: right;
+}
+
+.cell {
+  width: 100%;
 }
