@@ -1,24 +1,33 @@
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
+import { useEffect, useState } from 'react';
+
+import { CONSTRUCTOR_ITEMS } from '@utils/constants';
 
 import styles from './burger-ingredients-card.module.css';
 
-export const BurgerIngredientsCard = ({ ingredient }) => {
-  //список ID эелементов для отображения чисел в счётчике
-  const targetIds = [
-    `60666c42cc7b410027a1a9b1`,
-    `60666c42cc7b410027a1a9b9`,
-    `60666c42cc7b410027a1a9b4`,
-    `60666c42cc7b410027a1a9bc`,
-    `60666c42cc7b410027a1a9bb`,
-    `60666c42cc7b410027a1a9bb`,
-    `60666c42cc7b410027a1a9be`,
-    `60666c42cc7b410027a1a9bf`,
-  ];
+export const BurgerIngredientsCard = ({ ingredient, onSelect }) => {
+  const [count, setCount] = useState(0);
 
-  const count = targetIds.filter((id) => id === ingredient._id).length;
+  useEffect(() => {
+    const { bunID, addedIDs } = CONSTRUCTOR_ITEMS;
+
+    if (ingredient._id === bunID) {
+      setCount(2);
+    } else {
+      setCount(addedIDs.filter((id) => id === ingredient._id).length);
+    }
+  }, [ingredient]);
+
+  const handleOpen = () => onSelect?.(ingredient);
 
   return (
-    <div className={`${styles.card} p-1`}>
+    <div
+      className={`${styles.card} p-1`}
+      role="button"
+      tabIndex={0}
+      onClick={handleOpen}
+      onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
+    >
       {count > 0 && (
         <div className={styles.counter}>
           <Counter count={count} size="default" extraClass="m-1" />

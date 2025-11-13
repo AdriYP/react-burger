@@ -2,11 +2,15 @@ import { BurgerIngredientsCard } from '@/components/burger-ingredients-card/burg
 
 import styles from './burger-ingredients-cardset.module.css';
 
-export const BurgerIngredientsCardSet = ({ ingredients }) => {
+export const BurgerIngredientsCardSet = ({ ingredients, onSelect }) => {
   return (
     <div className={`${styles.grid} p-1`}>
       {ingredients.map((ingredient) => (
-        <BurgerIngredientsCard key={ingredient._id} ingredient={ingredient} />
+        <BurgerIngredientsCard
+          key={ingredient._id}
+          ingredient={ingredient}
+          onSelect={onSelect}
+        />
       ))}
     </div>
   );
