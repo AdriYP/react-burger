@@ -4,51 +4,174 @@ import {
   CurrencyIcon,
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
-import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { Modal } from '@components/modal/modal';
-import { OrderDetails } from '@components/order-details/order-details';
-import { CONSTRUCTOR_ITEMS } from '@utils/constants';
+import {
+  decreaseItem,
+  increaseItem,
+  moveIngredient,
+} from '@/services/burger-constructor/actions';
+import {
+  selectConstructorBun,
+  selectConstructorIngredients,
+  selectConstructorTotalPrice,
+} from '@/services/burger-constructor/selectors';
+import { sendOrder } from '@/services/order/actions';
+import { DND_TYPES } from '@/utils/constants';
+
+import { Modal } from '../modal/modal';
+import { OrderDetails } from '../order-details/order-details';
 
 import styles from './burger-constructor.module.css';
 
-export const BurgerConstructor = ({ ingredients }) => {
-  console.log(ingredients);
-  const [bun, setBun] = useState(null);
-  const [betweenBuns, setBetweenBuns] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
+//заглушка для пустых данных
+const ConstructorPlaceholder = ({ position, text }) => {
+  const positionClass =
+    position === 'top'
+      ? styles.placeholder_top
+      : position === 'bottom'
+        ? styles.placeholder_bottom
+        : styles.placeholder_middle;
+
+  return (
+    <div className={`${styles.placeholder} ${positionClass}`}>
+      <span className="text text_type_main-default">{text}</span>
+    </div>
+  );
+};
+
+// вынесено для перетаскивания строки в dnd из-за хуков
+const ConstructorIngredientRow = ({ item, index, moveItem, dispatch }) => {
+  const ref = useRef(null);
+
+  // drag
+  const [{ isDragging }, dragRef] = useDrag(
+    () => ({
+      type: DND_TYPES.CONSTRUCTOR_INGREDIENT,
+      item: { index, constructorId: item.constructorId },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [index, item.constructorId]
+  );
+
+  // drop
+  const [, dropRef] = useDrop(
+    () => ({
+      accept: DND_TYPES.CONSTRUCTOR_INGREDIENT,
+      hover: (dragItem, monitor) => {
+        if (!ref.current) return;
+
+        const dragIndex = dragItem.index;
+        const hoverIndex = index;
+
+        if (dragIndex === hoverIndex) {
+          return;
+        }
+
+        //считаем, пересёк ли указатель середину элемента
+        const hoverBoundingRect = ref.current.getBoundingClientRect();
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+        const clientOffset = monitor.getClientOffset();
+        const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+
+        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+          return;
+        }
+        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+          return;
+        }
+
+        // меняем порядок в сторе
+        moveItem(dragIndex, hoverIndex);
+        dragItem.index = hoverIndex;
+      },
+    }),
+    [index, moveItem]
+  );
+
+  // объединяем drag+drop
+  dragRef(dropRef(ref));
+
+  return (
+    <div
+      ref={ref}
+      className={styles.row}
+      data-id={item.constructorId}
+      style={{ opacity: isDragging ? 0.4 : 1 }}
+    >
+      <DragIcon type="primary" />
+      <div className={styles.cell}>
+        <ConstructorElement
+          text={item.name}
+          price={item.price}
+          thumbnail={item.image}
+          handleClose={() => dispatch(decreaseItem(item))}
+        />
+      </div>
+    </div>
+  );
+};
+
+// общий хук для drop булки (верх и низ)
+const useBunDrop = (dispatch) => {
+  return useDrop(
+    () => ({
+      accept: DND_TYPES.INGREDIENT,
+      drop: ({ ingredient }) => {
+        if (ingredient.type === 'bun') {
+          dispatch(increaseItem(ingredient));
+        }
+      },
+    }),
+    [dispatch]
+  );
+};
+
+export const BurgerConstructor = () => {
+  const bun = useSelector(selectConstructorBun);
+  const ingredients = useSelector(selectConstructorIngredients);
+  const totalPrice = useSelector(selectConstructorTotalPrice);
+
+  const dispatch = useDispatch();
+
   const [orderModal, setOrderModal] = useState(null);
 
-  useEffect(() => {
-    if (!Array.isArray(ingredients) || ingredients.length === 0) {
-      setBun(null);
-      setBetweenBuns([]);
-      setTotalPrice(0);
-      return;
-    }
+  const hasBun = !!bun;
+  const hasIngredients = Array.isArray(ingredients) && ingredients.length > 0;
 
-    const { bunID, addedIDs } = CONSTRUCTOR_ITEMS;
-    const byId = new Map(ingredients.map((i) => [i._id, i]));
+  const bunPrice = bun?.price ?? 0;
+  const bunThumb = bun?.image ?? null;
 
-    const currentBun = byId.get(bunID) || null;
-    const currentBetween = Array.isArray(addedIDs)
-      ? addedIDs.map((id) => byId.get(id)).filter(Boolean)
-      : [];
+  const handleClick = () => {
+    dispatch(sendOrder());
+    setOrderModal(true);
+  };
 
-    // считаем сумму: булка * 2 (верх и низ) + все добавленные
-    const bunPrice = currentBun?.price ?? 0;
-    const addedSum = currentBetween.reduce((sum, item) => sum + (item?.price ?? 0), 0);
-    const sum = bunPrice * 2 + addedSum;
+  // drop-зона для булки (верх/низ)
+  const [, topBunDropRef] = useBunDrop(dispatch);
+  const [, bottomBunDropRef] = useBunDrop(dispatch);
 
-    setBun(currentBun);
-    setBetweenBuns(currentBetween);
-    setTotalPrice(sum);
-  }, [ingredients]);
+  // drop-зона для начинки (между булками)
+  const [, ingredientsDropRef] = useDrop(
+    () => ({
+      accept: DND_TYPES.INGREDIENT,
+      drop: ({ ingredient }) => {
+        if (ingredient.type !== 'bun') {
+          dispatch(increaseItem(ingredient));
+        }
+      },
+    }),
+    [dispatch]
+  );
 
-  const topBunName = bun?.name ?? 'Булка';
-  const topBunPrice = bun?.price ?? 0;
-  const topBunThumb = bun?.image ?? null;
+  // перетаскивание внутри конструтора
+  const handleMoveIngredient = (fromIndex, toIndex) => {
+    dispatch(moveIngredient(fromIndex, toIndex));
+  };
 
   return (
     <>
@@ -56,46 +179,63 @@ export const BurgerConstructor = ({ ingredients }) => {
         {/* top */}
         <div className={styles.row}>
           <div className={styles.handlePlaceholder} />
-          <div className={styles.cell}>
-            <ConstructorElement
-              type="top"
-              isLocked={true}
-              text={`${topBunName}  (верх)`}
-              price={topBunPrice}
-              thumbnail={topBunThumb}
-            />
+          <div className={styles.cell} ref={topBunDropRef}>
+            {hasBun ? (
+              <ConstructorElement
+                type="top"
+                isLocked={true}
+                text={`${bun.name} (верх)`}
+                price={bunPrice}
+                thumbnail={bunThumb}
+              />
+            ) : (
+              <ConstructorPlaceholder position="top" text="Выберите булки" />
+            )}
           </div>
         </div>
+
         {/* list */}
         <div className={`${styles.scrollArea} custom-scroll`}>
-          <div className={styles.list}>
-            {betweenBuns.map((item, idx) => (
-              <div className={styles.row} key={`${item._id}-${idx}`}>
-                <DragIcon type="primary" />
+          <div className={styles.list} ref={ingredientsDropRef}>
+            {hasIngredients ? (
+              ingredients.map((item, index) => (
+                <ConstructorIngredientRow
+                  key={item.constructorId}
+                  item={item}
+                  index={index}
+                  moveItem={handleMoveIngredient}
+                  dispatch={dispatch}
+                />
+              ))
+            ) : (
+              <div className={styles.row}>
+                <div className={styles.handlePlaceholder} />
                 <div className={styles.cell}>
-                  <ConstructorElement
-                    text={item.name}
-                    price={item.price}
-                    thumbnail={item.image}
-                  />
+                  <ConstructorPlaceholder position="middle" text="Выберите начинку" />
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
+
         {/* bottom */}
         <div className={styles.row}>
           <div className={styles.handlePlaceholder} />
-          <div className={styles.cell}>
-            <ConstructorElement
-              type="bottom"
-              isLocked={true}
-              text={`${topBunName}  (низ)`}
-              price={topBunPrice}
-              thumbnail={topBunThumb}
-            />
+          <div className={styles.cell} ref={bottomBunDropRef}>
+            {hasBun ? (
+              <ConstructorElement
+                type="bottom"
+                isLocked={true}
+                text={`${bun.name} (низ)`}
+                price={bunPrice}
+                thumbnail={bunThumb}
+              />
+            ) : (
+              <ConstructorPlaceholder position="bottom" text="Выберите булки" />
+            )}
           </div>
         </div>
+
         {/* total */}
         <div className={`${styles.totalBar} mt-6`}>
           <div className={styles.priceGroup}>
@@ -106,12 +246,13 @@ export const BurgerConstructor = ({ ingredients }) => {
             htmlType="button"
             type="primary"
             size="large"
-            onClick={() => setOrderModal(true)}
+            onClick={() => handleClick()}
           >
             Оформить заказ
           </Button>
         </div>
       </section>
+
       {orderModal && (
         <Modal title="" onClose={() => setOrderModal(false)}>
           <OrderDetails />
@@ -120,22 +261,4 @@ export const BurgerConstructor = ({ ingredients }) => {
     </>
   );
 };
-
-BurgerConstructor.propTypes = {
-  ingredients: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      proteins: PropTypes.number,
-      fat: PropTypes.number,
-      carbohydrates: PropTypes.number,
-      calories: PropTypes.number,
-      price: PropTypes.number.isRequired,
-      image: PropTypes.string,
-      image_mobile: PropTypes.string,
-      image_large: PropTypes.string,
-      __v: PropTypes.number,
-    })
-  ).isRequired,
-};
+//.propTypes удалён в соответствии с комментарием к "Sprint 1/step 2"

@@ -1,5 +1,4 @@
 import { CloseIcon } from '@krgaa/react-developer-burger-ui-components';
-import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -43,8 +42,4 @@ export const Modal = ({ title, children, onClose }) => {
     document.getElementById('modal-root')
   );
 };
-
-Modal.propTypes = {
-  children: PropTypes.node.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
+//.propTypes удалён в соответствии с комментарием к "Sprint 1/step 2"
