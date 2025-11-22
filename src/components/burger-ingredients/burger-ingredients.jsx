@@ -1,37 +1,86 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
-import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { BurgerIngredientsCardSet } from '@/components/burger-ingredients-cardset/burger-ingredients-cardset';
+import { selectIngredientsByType } from '@/services/burger-ingredients/selectors';
 import { IngredientDetails } from '@components/ingredient-details/ingredient-details';
 import { Modal } from '@components/modal/modal';
 
 import styles from './burger-ingredients.module.css';
 
-const CATEGORIES = [
-  { type: 'bun', title: 'Булки' },
-  { type: 'main', title: 'Начинки' },
-  { type: 'sauce', title: 'Соусы' },
-];
-
-export const BurgerIngredients = ({ ingredients }) => {
-  console.log(ingredients);
-
-  const [grouped, setGrouped] = useState({
-    bun: [],
-    main: [],
-    sauce: [],
-  });
+export const BurgerIngredients = () => {
+  const buns = useSelector(selectIngredientsByType('bun'));
+  const sauces = useSelector(selectIngredientsByType('sauce'));
+  const mains = useSelector(selectIngredientsByType('main'));
 
   const [currentIngredient, setCurrentIngredient] = useState(null);
+  const [currentTab, setCurrentTab] = useState('bun');
 
-  useEffect(() => {
-    const regrouped = { bun: [], main: [], sauce: [] };
-    for (const ing of ingredients) {
-      regrouped[ing.type].push(ing);
+  const scrollContainerRef = useRef(null);
+  // рефы на секции
+  const bunsSectionRef = useRef(null);
+  const mainsSectionRef = useRef(null);
+  const saucesSectionRef = useRef(null);
+
+  const getSectionRefByType = (type) => {
+    if (type === 'bun') return bunsSectionRef;
+    if (type === 'main') return mainsSectionRef;
+    if (type === 'sauce') return saucesSectionRef;
+    return bunsSectionRef;
+  };
+
+  // scrollTo
+  const handleTabClick = useCallback((type) => {
+    setCurrentTab(type);
+
+    const container = scrollContainerRef.current;
+    const sectionRef = getSectionRefByType(type);
+    const section = sectionRef.current;
+
+    if (container && section) {
+      const containerTop = container.getBoundingClientRect().top;
+      const sectionTop = section.getBoundingClientRect().top;
+      const offset = sectionTop - containerTop + container.scrollTop;
+
+      container.scrollTo({
+        top: offset,
+        behavior: 'smooth',
+      });
     }
-    setGrouped(regrouped);
-  }, [ingredients]);
+  }, []);
+
+  //смена таба секции
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const containerTop = container.getBoundingClientRect().top;
+
+    const sections = [
+      { type: 'bun', node: bunsSectionRef.current },
+      { type: 'main', node: mainsSectionRef.current },
+      { type: 'sauce', node: saucesSectionRef.current },
+    ];
+
+    let closestType = currentTab;
+    let minDelta = Infinity;
+
+    sections.forEach(({ type, node }) => {
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const delta = Math.abs(rect.top - containerTop);
+
+      if (delta < minDelta) {
+        minDelta = delta;
+        closestType = type;
+      }
+    });
+
+    if (closestType !== currentTab) {
+      setCurrentTab(closestType);
+    }
+  }, [currentTab]);
 
   return (
     <>
@@ -40,73 +89,75 @@ export const BurgerIngredients = ({ ingredients }) => {
           <ul className={styles.menu}>
             <Tab
               value="bun"
-              active={true}
+              active={currentTab === 'bun'}
               onClick={() => {
-                /* TODO */
+                handleTabClick('bun');
               }}
             >
               Булки
             </Tab>
             <Tab
               value="main"
-              active={false}
+              active={currentTab === 'main'}
               onClick={() => {
-                /* TODO */
+                handleTabClick('main');
               }}
             >
               Начинки
             </Tab>
             <Tab
               value="sauce"
-              active={false}
+              active={currentTab === 'sauce'}
               onClick={() => {
-                /* TODO */
+                handleTabClick('sauce');
               }}
             >
               Соусы
             </Tab>
           </ul>
         </nav>
-        <div className={`${styles.burger_cardset} custom-scroll mt-10`}>
-          {CATEGORIES.map(({ type, title }) => (
-            <section key={type} className="mb-10">
-              <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
-                {title}
-              </h2>
-              <div>
-                <BurgerIngredientsCardSet
-                  ingredients={grouped[type]}
-                  onSelect={setCurrentIngredient}
-                />
-              </div>
-            </section>
-          ))}
+        <div
+          className={`${styles.burger_cardset} custom-scroll mt-10`}
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+        >
+          <section key="buns" className="mb-10" ref={bunsSectionRef}>
+            <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
+              Булки
+            </h2>
+            <div>
+              <BurgerIngredientsCardSet ingredients={buns} />
+            </div>
+          </section>
+
+          <section key="mains" className="mb-10" ref={mainsSectionRef}>
+            <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
+              Начинки
+            </h2>
+            <div>
+              <BurgerIngredientsCardSet
+                ingredients={mains}
+                // onSelect={setCurrentIngredient}
+              />
+            </div>
+          </section>
+
+          <section key="sauces" className="mb-10" ref={saucesSectionRef}>
+            <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
+              Соусы
+            </h2>
+            <div>
+              <BurgerIngredientsCardSet ingredients={sauces} />
+            </div>
+          </section>
         </div>
       </section>
       {currentIngredient && (
         <Modal title="Детали ингредиента" onClose={() => setCurrentIngredient(false)}>
-          <IngredientDetails ingredient={currentIngredient} />
+          <IngredientDetails />
         </Modal>
       )}
     </>
   );
 };
-
-BurgerIngredients.propTypes = {
-  ingredients: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      proteins: PropTypes.number,
-      fat: PropTypes.number,
-      carbohydrates: PropTypes.number,
-      calories: PropTypes.number,
-      price: PropTypes.number.isRequired,
-      image: PropTypes.string,
-      image_mobile: PropTypes.string,
-      image_large: PropTypes.string,
-      __v: PropTypes.number,
-    })
-  ).isRequired,
-};
+//.propTypes удалён в соответствии с комментарием к "Sprint 1/step 2"

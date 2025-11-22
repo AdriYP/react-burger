@@ -1,11 +1,38 @@
+import { useSelector } from 'react-redux';
+
+import {
+  selectOrderNumber,
+  selectOrderLoading,
+  selectOrderError,
+} from '@/services/order/selectors';
+
 import successIcon from '../../images/order.png';
 
 import styles from './order-details.module.css';
 
 export const OrderDetails = () => {
-  // Генерация 6-значного идентификатора
-  const orderId = String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0');
+  const orderId = useSelector(selectOrderNumber);
+  const loading = useSelector(selectOrderLoading);
+  const error = useSelector(selectOrderError);
 
+  if (loading) {
+    return (
+      <div className={`${styles.wrapper} pb-30 pt-4`}>
+        <p className="text text_type_main-medium pb-8">Отправляем заказ...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`${styles.wrapper} pb-30 pt-4`}>
+        <p className="text text_type_main-medium pb-8">Ошибка оформления заказа</p>
+        <p className="text text_type_main-default">{error}</p>
+      </div>
+    );
+  }
+
+  // нормальное состояние
   return (
     <div className={`${styles.wrapper} pb-30 pt-4`}>
       <p className={`${styles.digitGlow} text text_type_digits-large pb-8`}>{orderId}</p>
