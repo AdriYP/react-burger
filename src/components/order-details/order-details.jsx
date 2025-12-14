@@ -1,3 +1,4 @@
+import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useSelector } from 'react-redux';
 
 import {
@@ -19,6 +20,7 @@ export const OrderDetails = () => {
     return (
       <div className={`${styles.wrapper} pb-30 pt-4`}>
         <p className="text text_type_main-medium pb-8">Отправляем заказ...</p>
+        <Preloader />
       </div>
     );
   }

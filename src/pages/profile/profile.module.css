@@ -1,0 +1,44 @@
+.page {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  width: 1240px;
+  padding-top: 120px;
+  column-gap: 60px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.navLink {
+  padding: 18px 0;
+  color: #8585ad;
+  text-decoration: none;
+}
+
+.navLinkActive {
+  color: #f2f2f3;
+}
+
+.hint {
+  margin-top: 80px;
+  color: #404053;
+  line-height: 1.5;
+}
+
+.content {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.stub {
+  width: 100%;
+  min-height: 200px;
+}
