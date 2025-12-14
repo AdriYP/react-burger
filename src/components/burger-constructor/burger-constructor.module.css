@@ -53,3 +53,29 @@
 .cell {
   width: 100%;
 }
+
+/* настройки стиля заглушек */
+
+.placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 80px;
+  padding: 16px 24px;
+  color: var(--text-primary-color, #fff);
+  background: var(--background-element);
+}
+
+.placeholder_top {
+  border-radius: var(--top-constructor-item-border-radius);
+}
+
+.placeholder_middle {
+  border-radius: var(--common-border-radius-s);
+}
+
+.placeholder_bottom {
+  border-radius: var(--bottom-constructor-item-border-radius);
+}
