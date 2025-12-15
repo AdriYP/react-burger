@@ -2,6 +2,7 @@ import { EmailInput, Button } from '@krgaa/react-developer-burger-ui-components'
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@/hooks/useForm';
 import { requestPasswordReset } from '@/utils/auth-api';
 
 import styles from './forgot-password.module.css';
@@ -9,7 +10,6 @@ import styles from './forgot-password.module.css';
 const RESET_FLAG_KEY = 'resetPassword';
 
 export function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -17,9 +17,7 @@ export function ForgotPasswordPage() {
   const location = useLocation();
   const from = location.state?.from || { pathname: '/' };
 
-  const onChange = (e) => {
-    setEmail(e.target.value);
-  };
+  const { values: form, handleChange: onChange } = useForm({ email: '' });
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +25,7 @@ export function ForgotPasswordPage() {
     setError(null);
 
     try {
-      await requestPasswordReset({ email });
+      await requestPasswordReset({ email: form.email });
 
       // разрешаем доступ на reset-password
       localStorage.setItem(RESET_FLAG_KEY, 'true');
@@ -47,7 +45,7 @@ export function ForgotPasswordPage() {
 
         <EmailInput
           onChange={onChange}
-          value={email}
+          value={form.email}
           name="email"
           placeholder="Укажите e-mail"
           extraClass="mb-6"

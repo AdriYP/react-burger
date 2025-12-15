@@ -1,6 +1,5 @@
+import { API_BASE_URL } from './stellar-api';
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from './token';
-
-export const AUTH_API_BASE_URL = 'https://norma.education-services.ru/api';
 
 const buildError = (message, status, data) => {
   const err = new Error(message);
@@ -27,7 +26,7 @@ const isTokenError = (err) => {
 };
 
 const request = async (endpoint, options) => {
-  const res = await fetch(`${AUTH_API_BASE_URL}${endpoint}`, options);
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
   const data = await parseJsonSafe(res);
 
   if (!res.ok) {

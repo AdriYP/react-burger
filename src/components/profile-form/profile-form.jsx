@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { useForm } from '@/hooks/useForm';
 import { patchUser } from '@/services/auth/actions';
 import {
   selectUser,
@@ -26,7 +27,11 @@ export const ProfileForm = () => {
 
   const [passwordResetKey, setPasswordResetKey] = useState(0);
 
-  const [form, setForm] = useState({
+  const {
+    values: form,
+    handleChange: onChange,
+    setValues: setForm,
+  } = useForm({
     name: '',
     email: '',
     password: '',
@@ -52,10 +57,6 @@ export const ProfileForm = () => {
     form.name !== initialForm.name ||
     form.email !== initialForm.email ||
     form.password !== initialForm.password;
-
-  const onChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const onCancel = () => {
     setForm(initialForm);

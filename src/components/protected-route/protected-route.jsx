@@ -1,7 +1,7 @@
-import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { CenteredPreloader } from '@/components/custom-preloader/custom-preloader';
 import { selectIsAuthChecked, selectUser } from '@/services/auth/selectors';
 
 export const ProtectedRoute = ({ onlyUnAuth = false, component }) => {
@@ -9,20 +9,7 @@ export const ProtectedRoute = ({ onlyUnAuth = false, component }) => {
   const user = useSelector(selectUser);
   const location = useLocation();
 
-  if (!isAuthChecked) {
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Preloader />
-      </div>
-    );
-  }
+  if (!isAuthChecked) return <CenteredPreloader />;
 
   // Страница только для авторизованных
   if (!onlyUnAuth && !user) {

@@ -4,10 +4,10 @@ import {
   Button,
   Preloader,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@/hooks/useForm';
 import { login } from '@/services/auth/actions';
 import { selectAuthLoading, selectAuthError } from '@/services/auth/selectors';
 
@@ -24,14 +24,10 @@ export function LoginPage() {
   //откуда пришли: либо из state.from, либо на главную
   const from = location.state?.from || { pathname: '/' };
 
-  const [form, setForm] = useState({
+  const { values: form, handleChange: onChange } = useForm({
     email: '',
     password: '',
   });
-
-  const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const onSubmit = (e) => {
     e.preventDefault();

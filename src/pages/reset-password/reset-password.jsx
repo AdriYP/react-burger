@@ -6,6 +6,7 @@ import {
 import { useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
+import { useForm } from '@/hooks/useForm';
 import { resetPassword } from '@/utils/auth-api';
 
 import styles from './reset-password.module.css';
@@ -13,7 +14,7 @@ import styles from './reset-password.module.css';
 const RESET_FLAG_KEY = 'resetPassword';
 
 export function ResetPasswordPage() {
-  const [form, setForm] = useState({
+  const { values: form, handleChange: onChange } = useForm({
     password: '',
     code: '',
   });
@@ -27,10 +28,6 @@ export function ResetPasswordPage() {
   const from = location.state?.from || { pathname: '/' };
 
   const [isAllowed] = useState(() => localStorage.getItem(RESET_FLAG_KEY) === 'true');
-
-  const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const onSubmit = async (e) => {
     e.preventDefault();

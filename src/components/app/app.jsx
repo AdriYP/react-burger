@@ -1,8 +1,8 @@
-import { Preloader } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
+import { CenteredPreloader } from '@/components/custom-preloader/custom-preloader';
 import { ForgotPasswordPage } from '@/pages/forgot-password/forgot-password';
 import { HomePage } from '@/pages/home/home';
 import { IngredientDetailsPage } from '@/pages/ingredient-details/ingredient-details';
@@ -43,19 +43,7 @@ export const App = () => {
     });
   }, []);
 
-  if (loading)
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Preloader />
-      </div>
-    );
+  if (loading) return <CenteredPreloader />;
 
   if (error) return <div>Ошибка: {error}</div>;
 

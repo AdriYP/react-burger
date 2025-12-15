@@ -5,10 +5,10 @@ import {
   Button,
   Preloader,
 } from '@krgaa/react-developer-burger-ui-components';
-import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
+import { useForm } from '@/hooks/useForm';
 import { register } from '@/services/auth/actions';
 import { selectAuthLoading, selectAuthError } from '@/services/auth/selectors';
 
@@ -24,15 +24,11 @@ export function RegisterPage() {
   const location = useLocation();
   const from = location.state?.from || { pathname: '/' };
 
-  const [form, setForm] = useState({
+  const { values: form, handleChange: onChange } = useForm({
     name: '',
     email: '',
     password: '',
   });
-
-  const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const onSubmit = (e) => {
     e.preventDefault();
