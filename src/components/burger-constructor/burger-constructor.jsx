@@ -7,7 +7,9 @@ import {
 import { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
+import { selectUser } from '@/services/auth/selectors';
 import {
   decreaseItem,
   increaseItem,
@@ -137,6 +139,8 @@ export const BurgerConstructor = () => {
   const totalPrice = useSelector(selectConstructorTotalPrice);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector(selectUser);
 
   const [orderModal, setOrderModal] = useState(null);
 
@@ -147,8 +151,12 @@ export const BurgerConstructor = () => {
   const bunThumb = bun?.image ?? null;
 
   const handleClick = () => {
-    dispatch(sendOrder());
+    if (!user) {
+      navigate('/login', { replace: true, state: { from: { pathname: '/' } } });
+      return;
+    }
     setOrderModal(true);
+    dispatch(sendOrder());
   };
 
   // drop-зона для булки (верх/низ)
@@ -247,6 +255,7 @@ export const BurgerConstructor = () => {
             type="primary"
             size="large"
             onClick={() => handleClick()}
+            disabled={!hasBun || !hasIngredients}
           >
             Оформить заказ
           </Button>

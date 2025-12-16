@@ -1,29 +1,23 @@
 import { Counter, CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useMemo } from 'react';
 import { useDrag } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import {
   selectConstructorBun,
   selectConstructorIngredients,
 } from '@/services/burger-constructor/selectors';
-import {
-  addDetailedIngredient,
-  deleteDetailedIngredient,
-} from '@/services/ingredient-details/actions';
-import { selectDetailedIngredient } from '@/services/ingredient-details/selectors';
 import { DND_TYPES } from '@/utils/constants';
-
-import { IngredientDetails } from '../ingredient-details/ingredient-details';
-import { Modal } from '../modal/modal';
 
 import styles from './burger-ingredients-card.module.css';
 
 export const BurgerIngredientsCard = ({ ingredient }) => {
-  const dispatch = useDispatch();
   const bun = useSelector(selectConstructorBun);
   const constructorIngredients = useSelector(selectConstructorIngredients);
-  const detailedIngredient = useSelector(selectDetailedIngredient);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const count = useMemo(() => {
     if (!ingredient) return 0;
@@ -54,8 +48,9 @@ export const BurgerIngredientsCard = ({ ingredient }) => {
   );
 
   const handleClick = () => {
-    // dispatch(increaseItem(ingredient));
-    dispatch(addDetailedIngredient(ingredient));
+    navigate(`/ingredients/${ingredient._id}`, {
+      state: { background: location },
+    });
   };
 
   return (
@@ -81,15 +76,6 @@ export const BurgerIngredientsCard = ({ ingredient }) => {
         </div>
         <p className={`${styles.name} text text_type_main-default`}>{ingredient.name}</p>
       </div>
-
-      {detailedIngredient && (
-        <Modal
-          title="Детали ингредиента"
-          onClose={() => dispatch(deleteDetailedIngredient())}
-        >
-          <IngredientDetails ingredient={detailedIngredient} />
-        </Modal>
-      )}
     </>
   );
 };

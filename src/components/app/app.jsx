@@ -1,44 +1,101 @@
 import { useEffect } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useDispatch, useSelector } from 'react-redux';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
+import { CenteredPreloader } from '@/components/custom-preloader/custom-preloader';
+import { ForgotPasswordPage } from '@/pages/forgot-password/forgot-password';
+import { HomePage } from '@/pages/home/home';
+import { IngredientDetailsPage } from '@/pages/ingredient-details/ingredient-details';
+import { LoginPage } from '@/pages/login/login';
+import { NotFoundPage } from '@/pages/not-found/not-found';
+import { ProfilePage } from '@/pages/profile/profile';
+import { RegisterPage } from '@/pages/register/register';
+import { ResetPasswordPage } from '@/pages/reset-password/reset-password';
 import {
   selectIngredientsError,
   selectIngredientsLoading,
 } from '@/services/app/selectors';
+import { checkAuth } from '@/services/auth/actions';
 import { loadIngredients } from '@/services/burger-ingredients/actions';
-import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import { BurgerIngredients } from '@components/burger-ingredients/burger-ingredients';
+
+import { AppHeader } from '../app-header/app-header';
+import { Modal } from '../modal/modal';
+import { ProtectedRoute } from '../protected-route/protected-route';
 
 import styles from './app.module.css';
 
 export const App = () => {
   const loading = useSelector(selectIngredientsLoading);
   const error = useSelector(selectIngredientsError);
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const state = location.state && location.state.background;
+  const backgroundLocation = state || null;
 
   useEffect(() => {
-    dispath(loadIngredients());
+    dispatch(loadIngredients());
+    //проверяем авторизацию
+    dispatch(checkAuth()).catch(() => {
+      //если не авторизован/токен протух — ок
+    });
   }, []);
 
-  if (loading) return <div>Загрузка...</div>;
+  if (loading) return <CenteredPreloader />;
 
   if (error) return <div>Ошибка: {error}</div>;
 
+  const handleCloseModal = () => {
+    navigate(-1);
+  };
+
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className={styles.app}>
-        <AppHeader />
-        <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-          Соберите бургер
-        </h1>
-        <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients />
-          <BurgerConstructor />
-        </main>
-      </div>
-    </DndProvider>
+    <div className={styles.app}>
+      <AppHeader />
+      <Routes location={backgroundLocation || location}>
+        {/* страницы доступны всем пользователям */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/ingredients/:id" element={<IngredientDetailsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+
+        {/* onlyUnAuth - страницы доступны только НЕавторизованным */}
+        <Route
+          path="/login"
+          element={<ProtectedRoute onlyUnAuth component={<LoginPage />} />}
+        />
+        <Route
+          path="/register"
+          element={<ProtectedRoute onlyUnAuth component={<RegisterPage />} />}
+        />
+        <Route
+          path="/forgot-password"
+          element={<ProtectedRoute onlyUnAuth component={<ForgotPasswordPage />} />}
+        />
+        <Route
+          path="/reset-password"
+          element={<ProtectedRoute onlyUnAuth component={<ResetPasswordPage />} />}
+        />
+
+        {/* страницы доступны только авторизованным */}
+        <Route
+          path="/profile/*"
+          element={<ProtectedRoute component={<ProfilePage />} />}
+        />
+      </Routes>
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            path="/ingredients/:id"
+            element={
+              <Modal title="Детали ингредиента" onClose={handleCloseModal}>
+                <IngredientDetailsPage />
+              </Modal>
+            }
+          />
+        </Routes>
+      )}
+    </div>
   );
 };
