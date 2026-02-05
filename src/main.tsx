@@ -5,11 +5,11 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { App } from '@components/app/app';
 
-import { configureStore } from './services/store';
+import { configureAppStore } from './services/store';
 
 import './index.css';
 
-const store = configureStore();
+const store = configureAppStore();
 
 const rootEl = document.getElementById('root');
 if (!rootEl) {

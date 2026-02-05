@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import { CenteredPreloader } from '@/components/custom-preloader/custom-preloader';
+import { FeedPage } from '@/pages/feed/feed';
 import { ForgotPasswordPage } from '@/pages/forgot-password/forgot-password';
 import { HomePage } from '@/pages/home/home';
 import { IngredientDetailsPage } from '@/pages/ingredient-details/ingredient-details';
 import { LoginPage } from '@/pages/login/login';
 import { NotFoundPage } from '@/pages/not-found/not-found';
+import { OrderInfoPage } from '@/pages/order-info/order-info';
 import { ProfilePage } from '@/pages/profile/profile';
 import { RegisterPage } from '@/pages/register/register';
 import { ResetPasswordPage } from '@/pages/reset-password/reset-password';
@@ -67,6 +69,8 @@ export const App = (): React.ReactElement => {
         {/* доступны всем */}
         <Route path="/" element={<HomePage />} />
         <Route path="/ingredients/:id" element={<IngredientDetailsPage />} />
+        <Route path="/feed" element={<FeedPage />} />
+        <Route path="/feed/:number" element={<OrderInfoPage />} />
         <Route path="*" element={<NotFoundPage />} />
 
         {/* onlyUnAuth - только НЕавторизованным */}
@@ -92,6 +96,10 @@ export const App = (): React.ReactElement => {
           path="/profile/*"
           element={<ProtectedRoute component={<ProfilePage />} />}
         />
+        <Route
+          path="/profile/orders/:number"
+          element={<ProtectedRoute component={<OrderInfoPage />} />}
+        />
       </Routes>
 
       {backgroundLocation && (
@@ -102,6 +110,26 @@ export const App = (): React.ReactElement => {
               <Modal title="Детали ингредиента" onClose={handleCloseModal}>
                 <IngredientDetailsPage />
               </Modal>
+            }
+          />
+          <Route
+            path="/feed/:number"
+            element={
+              <Modal onClose={handleCloseModal}>
+                <OrderInfoPage hideNumber />
+              </Modal>
+            }
+          />
+          <Route
+            path="/profile/orders/:number"
+            element={
+              <ProtectedRoute
+                component={
+                  <Modal onClose={handleCloseModal}>
+                    <OrderInfoPage hideNumber />
+                  </Modal>
+                }
+              />
             }
           />
         </Routes>

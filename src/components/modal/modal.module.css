@@ -30,7 +30,7 @@
   }
 }
 
-.header {
+/* .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -43,4 +43,29 @@
   border: none;
   cursor: pointer;
   appearance: none;
+} */
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+/* номер заказа в шапке модалки /feed/:number и /profile/orders/:number */
+
+.orderNumber {
+  margin: 0;
+
+  /* в макете он слева, поэтому просто стандартный поток */
+}
+
+/* крестик прижат вправо */
+
+.close {
+  margin-left: auto;
+  padding: 0;
+
+  /* margin-right: 40px;   или 20px, подгони под макет */
+  background: none;
+  border: none;
+  cursor: pointer;
 }
