@@ -45,7 +45,7 @@ export function LoginPage(): React.ReactElement {
     e.preventDefault();
 
     try {
-      await dispatch(login({ email: form.email, password: form.password }));
+      dispatch(login({ email: form.email, password: form.password }));
       navigate(from.pathname || '/', { replace: true });
     } catch (err: unknown) {
       console.error(err);

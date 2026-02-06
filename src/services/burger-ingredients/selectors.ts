@@ -4,7 +4,7 @@ import type { TIngredient, TIngredientType } from '@/types/ingredient';
 
 import type { RootState } from '../store';
 
-const selectIngredientsList = (state: RootState): TIngredient[] =>
+export const selectIngredientsList = (state: RootState): TIngredient[] =>
   state.ingredients.ingredientsList;
 
 const selectByType = (state: RootState): Record<TIngredientType, string[]> =>

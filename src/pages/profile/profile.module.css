@@ -37,8 +37,3 @@
   display: flex;
   justify-content: flex-start;
 }
-
-.stub {
-  width: 100%;
-  min-height: 200px;
-}

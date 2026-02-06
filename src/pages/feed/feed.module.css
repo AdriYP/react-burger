@@ -1,0 +1,82 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1260px;
+  margin: 40px auto 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px 0;
+  column-gap: 60px;
+}
+
+.leftColumn {
+  display: flex;
+  flex: 0 0 608px;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 608px;
+}
+
+.ordersLst {
+  width: 100%;
+}
+
+.rightColumn {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+}
+
+.statusRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  column-gap: 80px;
+}
+
+.statusColumn {
+  flex: 0 0 auto;
+}
+
+/* несколько списков-колонок (по 10 элементов в каждом) в ряд */
+
+.statusNumbersRow {
+  display: flex;
+  column-gap: 16px;
+}
+
+.statusList {
+  display: flex;
+  flex-direction: column;
+  row-gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.statusItem,
+.statusItem_done {
+  line-height: 1.15;
+  white-space: nowrap; /* цифры не переносятся */
+}
+
+.statusItem_done {
+  color: #0cc;
+}
+
+.totalBlock {
+  margin-top: 24px;
+  padding-top: 0;
+}
+
+.totalNumber {
+  text-shadow: 0 0 24px rgb(51 51 255 / 75%);
+}

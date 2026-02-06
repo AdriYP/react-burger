@@ -1,0 +1,91 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 24px;
+  background-color: #1c1c21;
+  border-radius: 40px;
+  cursor: pointer;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  margin: 0;
+  color: #f2f2f3; /* базовый — белый */
+  font-size: 16px;
+}
+
+.statusDone {
+  color: #0cc; /* цвет только для "Выполнен" */
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.ingredientsRow {
+  display: flex;
+}
+
+.ingredientWrapper {
+  position: relative;
+  margin-left: -16px;
+}
+
+.ingredientWrapper:first-child {
+  margin-left: 0;
+}
+
+.ingredientCircle {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 64px;
+  height: 64px;
+  padding: 2px;
+  background: linear-gradient(70deg, #801ab2 0%, #4c4cff 70%);
+  border-radius: 50%;
+}
+
+.ingredientCircleInner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #131316;
+  border-radius: 50%;
+}
+
+.ingredientImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.extra {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

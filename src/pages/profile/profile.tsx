@@ -1,16 +1,15 @@
 import { NavLink, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
 import { ProfileForm } from '@/components/profile-form/profile-form';
+import { ProtectedRoute } from '@/components/protected-route/protected-route';
 import { logout as logoutThunk } from '@/services/auth/actions';
 import { useAppDispatch } from '@/services/hooks';
+
+import { ProfileOrdersPage } from '../profile-orders/profile-orders';
 
 import type React from 'react';
 
 import styles from './profile.module.css';
-
-// заглушки под вложенные маршруты
-const OrdersPageStub = (): React.ReactElement => <div className={styles.stub} />;
-const OrderDetailsStub = (): React.ReactElement => <div className={styles.stub} />;
 
 export function ProfilePage(): React.ReactElement {
   const dispatch = useAppDispatch();
@@ -68,8 +67,10 @@ export function ProfilePage(): React.ReactElement {
         <section className={styles.content}>
           <Routes>
             <Route index element={<ProfileForm />} />
-            <Route path="orders" element={<OrdersPageStub />} />
-            <Route path="orders/:id" element={<OrderDetailsStub />} />
+            <Route
+              path="orders"
+              element={<ProtectedRoute component={<ProfileOrdersPage />} />}
+            />
           </Routes>
         </section>
       </div>
