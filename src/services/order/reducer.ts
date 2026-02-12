@@ -15,7 +15,7 @@ export type TOrderState = {
   error: string | null;
 };
 
-const initialState: TOrderState = {
+export const initialState: TOrderState = {
   dataSend: null,
   dataReceived: null,
   loading: false,

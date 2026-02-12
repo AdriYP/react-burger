@@ -50,13 +50,11 @@
 
 .statusNumbersRow {
   display: flex;
-  column-gap: 16px;
 }
 
 .statusList {
   display: flex;
   flex-direction: column;
-  row-gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -64,7 +62,6 @@
 
 .statusItem,
 .statusItem_done {
-  line-height: 1.15;
   white-space: nowrap; /* цифры не переносятся */
 }
 

@@ -229,6 +229,7 @@ export const BurgerConstructor = (): React.ReactElement => {
             ref={(node) => {
               topBunDropRef(node);
             }}
+            data-testid="constructor-dropzone-top" // Cypress
           >
             {hasBun ? (
               <ConstructorElement
@@ -251,6 +252,7 @@ export const BurgerConstructor = (): React.ReactElement => {
             ref={(node) => {
               ingredientsDropRef(node);
             }}
+            data-testid="constructor-dropzone" // Cypress
           >
             {hasIngredients ? (
               ingredients.map((item: TConstructorIngredient, index: number) => (
@@ -280,6 +282,7 @@ export const BurgerConstructor = (): React.ReactElement => {
             ref={(node) => {
               bottomBunDropRef(node);
             }}
+            data-testid="constructor-dropzone-bottom" // Cypress
           >
             {hasBun ? (
               <ConstructorElement
@@ -307,6 +310,7 @@ export const BurgerConstructor = (): React.ReactElement => {
             size="large"
             onClick={handleClick}
             disabled={!hasBun || !hasIngredients}
+            data-testid="order-submit" // Cypress
           >
             Оформить заказ
           </Button>

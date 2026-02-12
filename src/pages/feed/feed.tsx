@@ -103,7 +103,7 @@ export const FeedPage = (): React.ReactElement => {
                     {chunk.map((order) => (
                       <li
                         key={order.number}
-                        className={`${styles.statusItem_done} text text_type_digits-default`}
+                        className={`${styles.statusItem_done} text text_type_digits-default mb-2 mr-4`}
                       >
                         {order.number.toString().padStart(6, '0')}
                       </li>
