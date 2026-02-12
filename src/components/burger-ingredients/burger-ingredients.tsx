@@ -117,23 +117,17 @@ export const BurgerIngredients = (): React.ReactElement => {
         onScroll={handleScroll}
       >
         <section className="mb-10" ref={bunsSectionRef}>
-          <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
-            Булки
-          </h2>
+          <h2 className={`text text_type_main-medium m-1`}>Булки</h2>
           <BurgerIngredientsCardSet ingredients={buns} />
         </section>
 
         <section className="mb-10" ref={mainsSectionRef}>
-          <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
-            Начинки
-          </h2>
+          <h2 className={`text text_type_main-medium m-1`}>Начинки</h2>
           <BurgerIngredientsCardSet ingredients={mains} />
         </section>
 
         <section className="mb-10" ref={saucesSectionRef}>
-          <h2 className={`${styles.cardset_title} text text_type_main-large m-1`}>
-            Соусы
-          </h2>
+          <h2 className={`text text_type_main-medium m-1`}>Соусы</h2>
           <BurgerIngredientsCardSet ingredients={sauces} />
         </section>
       </div>

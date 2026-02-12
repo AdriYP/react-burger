@@ -9,25 +9,15 @@
 }
 
 .number {
-  margin: 0 0 48px;
   text-align: center;
 }
 
-.title {
-  margin: 0 0 12px;
-}
-
 .status {
-  margin: 0 0 60px;
   color: #f2f2f3;
 }
 
 .statusDone {
   color: #0cc;
-}
-
-.compositionTitle {
-  margin: 0 0 24px;
 }
 
 .ingredientsScroll {

@@ -80,6 +80,8 @@ export const BurgerIngredientsCard = ({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       style={{ opacity: isDragging ? 0.5 : 1 }}
+      data-testid="ingredient-card" // Cypress: найти любую карточку
+      data-ingredient-id={ingredient._id} // Cypress: найти конкретный ингредиент по id
     >
       {count > 0 && (
         <div className={styles.counter}>
