@@ -1,75 +1,74 @@
 /// <reference types="cypress" />
 
-const BASE_URL = 'http://localhost:5173/';
+const TOKENS = {
+  accessToken: 'Bearer test-accessToken',
+  refreshToken: 'test-refreshToken',
+} as const;
 
-const ACCESS_TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+const TEST_IDS = {
+  modal: 'modal',
+  modalClose: 'modal-close',
+  dropzone: 'constructor-dropzone',
+  dropzoneTop: 'constructor-dropzone-top',
+  orderSubmit: 'order-submit',
+} as const;
 
-const IDS = {
+const INGREDIENT_IDS = {
   bun: '60666c42cc7b410027a1a9b1',
   main: '60666c42cc7b410027a1a9b5',
   sauce: '60666c42cc7b410027a1a9b7',
 } as const;
 
-const setAuthTokens = (): void => {
-  window.localStorage.setItem(REFRESH_TOKEN_KEY, 'test-refreshToken');
-  window.localStorage.setItem(ACCESS_TOKEN_KEY, 'Bearer test-accessToken');
-};
-
-const byIngredientId = (id: string): string =>
-  `[data-testid="ingredient-card"][data-ingredient-id="${id}"]`;
-
-const dnd = (sourceAlias: string, targetAlias: string): void => {
-  const dataTransfer = new DataTransfer();
-  cy.get(sourceAlias).trigger('dragstart', { dataTransfer });
-  cy.get(targetAlias).trigger('drop', { dataTransfer });
-};
+const selectors = {
+  ingredientCardById: (id: string): string =>
+    `[data-testid="ingredient-card"][data-ingredient-id="${id}"]`,
+} as const;
 
 describe('Constructor page (Stellar Burger)', () => {
   beforeEach((): void => {
+    cy.clearTokens();
+    cy.setTokens(TOKENS);
+
     cy.intercept('GET', '**/ingredients', { fixture: 'ingredients.json' }).as(
       'getIngredients'
     );
-
-    // Ключевой мок: приложение должно увидеть залогиненного юзера
     cy.intercept('GET', '**/auth/user', { fixture: 'user.json' }).as('getUser');
-
     cy.intercept('POST', '**/orders', { fixture: 'order.json' }).as('postOrder');
 
-    cy.visit(BASE_URL, {
-      onBeforeLoad: (): void => {
-        window.localStorage.clear();
-        setAuthTokens();
-      },
-    });
+    cy.visit('/');
 
     cy.wait('@getIngredients');
     cy.wait('@getUser');
 
-    cy.get('[data-testid="constructor-dropzone"]').as('dropList');
-    cy.get('[data-testid="constructor-dropzone-top"]').as('dropTop');
-    cy.get('[data-testid="order-submit"]').as('submitOrder');
+    cy.getByTestId(TEST_IDS.dropzone).as('dropList');
+    cy.getByTestId(TEST_IDS.dropzoneTop).as('dropTop');
+    cy.getByTestId(TEST_IDS.orderSubmit).as('submitOrder');
 
-    cy.get(byIngredientId(IDS.bun)).as('bunCard');
-    cy.get(byIngredientId(IDS.main)).as('mainCard');
-    cy.get(byIngredientId(IDS.sauce)).as('sauceCard');
+    cy.get(selectors.ingredientCardById(INGREDIENT_IDS.bun)).as('bunCard');
+    cy.get(selectors.ingredientCardById(INGREDIENT_IDS.main)).as('mainCard');
+    cy.get(selectors.ingredientCardById(INGREDIENT_IDS.sauce)).as('sauceCard');
+  });
+
+  afterEach((): void => {
+    cy.clearTokens();
   });
 
   it('should drag ingredients, open/close ingredient modal, create order and close order modal', (): void => {
     cy.get('@bunCard').click();
-    cy.get('[data-testid="modal"]').as('modal').should('be.visible');
+
+    cy.getByTestId(TEST_IDS.modal).as('modal').should('be.visible');
     cy.get('@modal').should('contain.text', 'Краторная булка N-200i');
 
-    cy.get('[data-testid="modal-close"]').as('modalClose').click();
-    cy.get('[data-testid="modal"]').should('not.exist');
+    cy.getByTestId(TEST_IDS.modalClose).click();
+    cy.getByTestId(TEST_IDS.modal).should('not.exist');
 
-    dnd('@bunCard', '@dropTop');
-    dnd('@mainCard', '@dropList');
-    dnd('@sauceCard', '@dropList');
+    cy.dragAndDrop('@bunCard', '@dropTop');
+    cy.dragAndDrop('@mainCard', '@dropList');
+    cy.dragAndDrop('@sauceCard', '@dropList');
 
     cy.get('@submitOrder').should('not.be.disabled').click();
 
-    // важно: убедимся, что не ушли на /login
+    // защита от редиректа на login
     cy.location('pathname').should('eq', '/');
 
     cy.wait('@postOrder').then((interception) => {
@@ -78,10 +77,8 @@ describe('Constructor page (Stellar Burger)', () => {
       expect(interception.request.body.ingredients.length).to.be.greaterThan(0);
     });
 
-    cy.get('[data-testid="modal"]').should('be.visible').and('contain.text', '12345');
-
-    // лучше не использовать старый alias, а закрывать “свежим” селектором
-    cy.get('[data-testid="modal-close"]').click();
-    cy.get('[data-testid="modal"]').should('not.exist');
+    cy.getByTestId(TEST_IDS.modal).should('be.visible').and('contain.text', '12345');
+    cy.getByTestId(TEST_IDS.modalClose).click();
+    cy.getByTestId(TEST_IDS.modal).should('not.exist');
   });
 });
