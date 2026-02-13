@@ -63,7 +63,13 @@ export const Modal = ({
     <>
       <ModalOverlay onClose={onClose} />
 
-      <div className={styles.modal} role="dialog" aria-modal="true" onClick={stopClick}>
+      <div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        onClick={stopClick}
+        data-testid="modal" // Cypress
+      >
         <div className={styles.content}>
           <div className={`${styles.header} pl-10 pr-10 pt-10`}>
             {headerContent}
@@ -73,6 +79,7 @@ export const Modal = ({
               onClick={onClose}
               className={styles.close}
               aria-label="Закрыть"
+              data-testid="modal-close" // Cypress
             >
               <CloseIcon type="primary" />
             </button>

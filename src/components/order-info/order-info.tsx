@@ -82,24 +82,22 @@ export const OrderInfo = ({
   return (
     <section className={styles.wrapper}>
       {showNumber && (
-        <p className={`${styles.number} text text_type_digits-default`}>
+        <p className={`${styles.number} text text_type_digits-default mb-3`}>
           {formattedNumber}
         </p>
       )}
 
-      <h1 className={`${styles.title} text text_type_main-medium`}>{name}</h1>
+      <h1 className={`text text_type_main-medium mb-3`}>{name}</h1>
 
       <p
-        className={`${styles.status} text text_type_main-default ${
+        className={`${styles.status} text text_type_main-default mb-15 ${
           isDone ? styles.statusDone : ''
         }`}
       >
         {statusTextMap[status]}
       </p>
 
-      <h2 className={`${styles.compositionTitle} text text_type_main-medium`}>
-        Состав:
-      </h2>
+      <h2 className={`text text_type_main-medium mb-6`}>Состав:</h2>
 
       <div className={styles.ingredientsScroll}>
         <ul className={styles.list}>

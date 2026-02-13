@@ -28,9 +28,9 @@
 }
 
 .hint {
-  margin-top: 80px;
-  color: #404053;
-  line-height: 1.5;
+  margin-top: 80px !important;
+  color: #404053 !important;
+  line-height: 1.5 !important;
 }
 
 .content {
